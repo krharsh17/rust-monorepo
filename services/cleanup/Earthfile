@@ -1,0 +1,25 @@
+VERSION --global-cache 0.7
+IMPORT github.com/earthly/lib/rust:2.2.10 AS rust
+
+deps:
+    DO rust+INIT --keep_fingerprints=true
+    COPY --keep-ts --dir src Cargo.lock Cargo.toml .
+    COPY ../../libs/filter+build/* /libs/filter
+
+# build creates the binary target/release/filter
+build:
+    FROM +deps
+    DO rust+CARGO --args="build --release --bin cleanup" --output="release/[^/\.]+"
+    SAVE ARTIFACT target/release/cleanup cleanup
+
+
+# test runs the tests present in the package
+test: 
+    FROM +build
+    RUN cargo test
+
+# docker creates docker image cleanup:latest
+docker:
+    FROM +compile
+    ENTRYPOINT ["./cleanup"]
+    SAVE IMAGE cleanup:latest

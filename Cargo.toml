@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "services/cleanup",
+    "services/ingest"
+]
+
+[workspace.dependencies]
+filter = { path = "libs/filter" }
