@@ -2,15 +2,19 @@ VERSION --global-cache 0.7
 IMPORT github.com/earthly/lib/rust:2.2.10 AS rust
 
 deps:
-    DO rust+INIT --keep_fingerprints=true
-    COPY --keep-ts --dir src Cargo.lock Cargo.toml .
-    COPY ../../libs/filter+build/* /libs/filter
+    LOCALLY
+    SAVE ARTIFACT ../../libs/filter src/libs/filter 
+    SAVE ARTIFACT ../cleanup/ src/services/cleanup
+    SAVE ARTIFACT ./ src/services/ingest
+    SAVE ARTIFACT ../../Cargo.toml src/Cargo.toml
 
-# build creates the binary target/release/filter
 build:
-    FROM +deps
+    FROM rust:slim-buster
+    COPY --dir +deps/src .
+    WORKDIR src
+    DO rust+INIT --keep_fingerprints=true
     DO rust+CARGO --args="build --release --bin ingest" --output="release/[^/\.]+"
-    SAVE ARTIFACT target/release/ingest ingest
+    SAVE ARTIFACT target/release cleanup
 
 
 # test runs the tests present in the package
@@ -20,6 +24,6 @@ test:
 
 # docker creates docker image ingest:latest
 docker:
-    FROM +compile
+    FROM +build
     ENTRYPOINT ["./ingest"]
     SAVE IMAGE ingest:latest

@@ -9,9 +9,9 @@ build:
     # Cargo UDC adds caching to cargo runs.
     # See https://github.com/earthly/lib/tree/main/rust
     DO rust+INIT --keep_fingerprints=true
-    COPY --keep-ts --dir src Cargo.lock Cargo.toml .
-    DO rust+CARGO --args="build --release --lib filter" --output="release/[^/\.]+"
-    SAVE ARTIFACT target/release/filter filter
+    COPY --keep-ts --dir src Cargo.toml .
+    DO rust+CARGO --args="build --release --lib" --output="release/[^/\.]+"
+    SAVE ARTIFACT target filter
 
 # test runs the tests present in the package
 test: 

@@ -1,8 +1,8 @@
 VERSION 0.5
 
 all-docker:
-    BUILD ./libs/ingest+docker
-    BUILD ./libs/cleanup+docker
+    BUILD ./services/ingest+docker
+    BUILD ./services/cleanup+docker
 
 all-unit-test:
     BUILD ./libs/filter+test
